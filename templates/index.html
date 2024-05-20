@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Classification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .form-group input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .result {
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .result.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .result.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Classification</h1>
+        <form id="image-form">
+            <div class="form-group">
+                <label for="image-input">Select an image:</label>
+                <input type="file" id="image-input" accept="image/*" required>
+            </div>
+            <button type="submit">Predict</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('image-form');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const file = document.getElementById('image-input').files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.textContent = `Error: ${data.error}`;
+                    resultDiv.classList.remove('success');
+                    resultDiv.classList.add('error');
+                } else {
+                    resultDiv.textContent = `Prediction: ${data.prediction}`;
+                    resultDiv.classList.remove('error');
+                    resultDiv.classList.add('success');
+                }
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error}`;
+                resultDiv.classList.remove('success');
+                resultDiv.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>
